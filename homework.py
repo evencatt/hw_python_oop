@@ -1,7 +1,6 @@
 from typing import Dict, List
 
 
-
 class InfoMessage:
     """Информационное сообщение о тренировке."""
 
@@ -112,7 +111,7 @@ def read_package(workout_type: str, data: List[int]) -> Training:
 
 def main(training: Training) -> None:
     """Главная функция."""
-    if training != None:
+    if training is not None:
         info = training.show_training_info()
         print(info.get_message())
     else:
@@ -121,7 +120,7 @@ def main(training: Training) -> None:
 
 if __name__ == '__main__':
     packages = [
-        ('SWM', [720, 1, 80, 25, 40]),
+        ('SWM1', [720, 1, 80, 25, 40]),
         ('RUN', [15000, 1, 75]),
         ('WLK', [9000, 1, 75, 180]),
     ]
