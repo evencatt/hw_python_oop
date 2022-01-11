@@ -1,7 +1,9 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
+
 
 class InfoMessage:
     """Информационное сообщение о тренировке."""
+
     def __init__(self, training_type: str, duration: float,
                  distance: float, speed: float, calories: float) -> None:
         self.training_type = training_type
@@ -51,6 +53,8 @@ class Training:
                            self.get_distance(), self.get_mean_speed(),
                            self.get_spent_calories())
 
+    def get_training_type(self) -> str:
+        return type(self).__name__
 
 class Running(Training):
     """Тренировка: бег."""
@@ -99,25 +103,26 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: List[int]) -> Training:
     """Прочитать данные полученные от датчиков."""
-    sport_type_ref: Dict[str, type] = {'SWM': Swimming, 'RUN': Running, 'WLK': SportsWalking}
-    try:
+    sport_type_ref: Dict[str, type] = {
+        'SWM': Swimming, 'RUN': Running, 'WLK': SportsWalking}
+    if workout_type not in sport_type_ref:
+        raise KeyError(f'Неизвестный тип тренировки: {workout_type}')
+    else:
         return sport_type_ref[workout_type](*data)
-    except KeyError:
-        print(f'Неизвестный тип тренировки: {workout_type}')
 
 
 def main(training: Training) -> None:
     """Главная функция."""
-    try:
+    if training != None:
         info = training.show_training_info()
         print(info.get_message())
-    except AttributeError:
+    else:
         print(f'Неизвестный тип тренировки: {workout_type}')
-    
+
 
 if __name__ == '__main__':
     packages = [
-        ('SWM1', [720, 1, 80, 25, 40]),
+        ('SWM', [720, 1, 80, 25, 40]),
         ('RUN', [15000, 1, 75]),
         ('WLK', [9000, 1, 75, 180]),
     ]
