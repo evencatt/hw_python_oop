@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 
 
@@ -54,8 +54,6 @@ class Training:
                            self.get_distance(), self.get_mean_speed(),
                            self.get_spent_calories())
 
-    def get_training_type(self) -> str:
-        return type(self).__name__
 
 class Running(Training):
     """Тренировка: бег."""
