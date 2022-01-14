@@ -1,16 +1,14 @@
-from typing import Dict, List
+from dataclasses import dataclass
+from typing import Dict, List, Union
 
 
+@dataclass
 class InfoMessage:
-    """Информационное сообщение о тренировке."""
-
-    def __init__(self, training_type: str, duration: float,
-                 distance: float, speed: float, calories: float) -> None:
-        self.training_type = training_type
-        self.duration = duration
-        self.distance = distance
-        self.speed = speed
-        self.calories = calories
+    training_type: str
+    duration: float
+    distance: float
+    speed: float
+    calories: float
 
     def get_message(self) -> str:
         return (f'Тип тренировки: {self.training_type}; '
@@ -21,9 +19,10 @@ class InfoMessage:
 
 
 class Training:
-    """Базовый класс тренировки."""
     M_IN_KM: int = 1000
     LEN_STEP: float = 0.65
+    coef_callorie_func_for_running_1: int = 18
+    coef_callorie_func_for_running_2: int = 20
 
     def __init__(self,
                  action: int,
@@ -35,37 +34,29 @@ class Training:
         self.weight = weight
 
     def get_distance(self) -> float:
-        """Получить дистанцию в км."""
         return self.action * self.LEN_STEP / self.M_IN_KM
 
     def get_mean_speed(self) -> float:
-        """Получить среднюю скорость движения."""
         return self.get_distance() / self.duration
 
     def get_spent_calories(self) -> float:
-        """Получить количество затраченных калорий."""
         raise NotImplementedError('Данный метод не определён'
                                   'в родительском классе')
 
     def show_training_info(self) -> InfoMessage:
-        """Вернуть информационное сообщение о выполненной тренировке."""
         return InfoMessage(type(self).__name__, self.duration,
                            self.get_distance(), self.get_mean_speed(),
                            self.get_spent_calories())
 
 
 class Running(Training):
-    """Тренировка: бег."""
-
     def get_spent_calories(self) -> float:
-        coef_callorie_1: int = 18
-        coef_callorie_2: int = 20
-        return ((coef_callorie_1 * self.get_mean_speed() - coef_callorie_2)
+        return ((self.coef_callorie_func_for_running_1 * self.get_mean_speed()
+                 - self.coef_callorie_func_for_running_2)
                 * self.weight / self.M_IN_KM * (self.duration * 60))
 
 
 class SportsWalking(Training):
-    """Тренировка: спортивная ходьба."""
 
     def __init__(self, action: int, duration: float,
                  weight: float, height: int) -> None:
@@ -82,7 +73,6 @@ class SportsWalking(Training):
 
 
 class Swimming(Training):
-    """Тренировка: плавание."""
     LEN_STEP: float = 1.38
 
     def __init__(self, action: int, duration: float, weight: float,
@@ -100,22 +90,19 @@ class Swimming(Training):
 
 
 def read_package(workout_type: str, data: List[int]) -> Training:
-    """Прочитать данные полученные от датчиков."""
-    sport_type_ref: Dict[str, type] = {
+    sport_type_ref: Dict[str, Union[Swimming, Running, SportsWalking]] = {
         'SWM': Swimming, 'RUN': Running, 'WLK': SportsWalking}
-    if workout_type not in sport_type_ref:
-        raise KeyError(f'Неизвестный тип тренировки: {workout_type}')
-    else:
+    if workout_type in sport_type_ref:
         return sport_type_ref[workout_type](*data)
+    raise KeyError(f'Неизвестный тип тренировки: {workout_type}')
 
 
 def main(training: Training) -> None:
-    """Главная функция."""
-    if training is not None:
+    if training:
         info = training.show_training_info()
         print(info.get_message())
-    else:
-        print(f'Неизвестный тип тренировки: {workout_type}')
+        return
+    print(f'Неизвестный тип тренировки: {workout_type}')
 
 
 if __name__ == '__main__':
